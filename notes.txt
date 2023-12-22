@@ -1,0 +1,31 @@
+#### NativeBase
+npm install native-base
+npx expo install react-native-svg@12.1.1
+npx expo install react-native-safe-area-context@3.3.2
+
+--> envolver o app com o NativeBaseProvider
+##################################
+
+#### react-native-svg-transformer
+para usar o svg como um componente
+
+--> npm i react-native-svg-transformer
+--> incluir o metro.config.js
+--> incluir o svg.d.ts
+##################################
+
+#### Rotas
+as rotas ficaram separadas o auth.routes.tsx para autenticação e o app.routes.tsx 
+para a aplicação
+##################################
+
+#### React Navigation
+npm install @react-navigation/native
+npm install react-native-screens react-native-safe-area-context
+
+StackNavigator: 
+npm install @react-navigation/native-stack
+
+Tab botton Navigator:
+npm install @react-navigation/bottom-tabs
+##################################
