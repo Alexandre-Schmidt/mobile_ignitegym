@@ -1,0 +1,307 @@
+
+
+#### NativeBase
+npm install native-base
+npx expo install react-native-svg@12.1.1
+npx expo install react-native-safe-area-context@3.3.2
+
+--> envolver o app com o NativeBaseProvider
+##################################
+
+#### react-native-svg-transformer
+para usar o svg como um componente
+
+--> npm i react-native-svg-transformer
+--> incluir o metro.config.js
+--> incluir o svg.d.ts
+##################################
+
+#### Rotas
+as rotas ficaram separadas o auth.routes.tsx para autenticação e o app.routes.tsx 
+para a aplicação
+##################################
+
+#### React Navigation
+npm install @react-navigation/native
+npm install react-native-screens react-native-safe-area-context
+
+StackNavigator: 
+npm install @react-navigation/native-stack
+
+Tab botton Navigator:
+npm install @react-navigation/bottom-tabs
+##################################
+
+#### SectionList
+serve para criar seções/divisão dentro de uma lista. 
+
+--> Importar 
+import {SectionList} from 'react-native';
+
+--> cria a estrutura. Tem que ser desse jeito
+const DATA = [
+  {
+    title: 'Main dishes',
+    data: ['Pizza', 'Burger', 'Risotto'],
+  },
+  {
+    title: 'Sides',
+    data: ['French Fries', 'Onion Rings', 'Fried Shrimps'],
+  },
+  {
+    title: 'Drinks',
+    data: ['Water', 'Coke', 'Beer'],
+  },
+];
+
+--> usar
+    <SectionList
+      sections={DATA}
+      keyExtractor={(item, index) => item + index}
+      renderItem={({item}) => (
+        <View style={styles.item}>
+          <Text style={styles.title}>{item}</Text>
+        </View>
+      )}
+      renderSectionHeader={({section: {title}}) => (
+        <Text style={styles.header}>{title}</Text>
+      )}
+    />
+##################################
+
+#### Skeleton
+O Skeleton irá servir como um feedback de loading para a imagem, enquanto a 
+imagem ainda não foi carregada
+
+--> importar 
+import { Center, ScrollView, VStack, Skeleton } from 'native-base';
+
+--> usar
+        <Center mt={6} px={10}>
+        {
+          photoIsLoading ?
+            <Skeleton 
+              w={PHOTO_SIZE}
+              h={PHOTO_SIZE}
+              rounded="full"
+              startColor="gray.500"
+              endColor="gray.400"
+            />
+          :
+            <UserPhoto 
+              source={{ uri: 'https://github.com/Alexandre-Schmidt.png' }}
+              alt="Foto do usuário"
+              size={PHOTO_SIZE}
+            />
+        }
+      </Center>
+##################################
+
+#### Image Picker
+seleciona as imagens no dispositivo do usuário 
+
+--> instalar
+npx expo install expo-image-picker
+
+--> no app.json, acresentar 
+"plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ]
+
+--> usar
+  --> import * as ImagePicker from 'expo-image-picker';
+  --> cria uma função para acessar o album com uma const recebendo esses dados
+      async function handleUserPhotoSelected(){
+        await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images, //tipo de conteudo que quer selecionar
+          quality: 1, //qualidade da imagem
+          aspect: [4, 4], //proporção da imagem 4x4 por exemplo
+          allowsEditing: true //abre a possibilidade de editar a imagem
+        });
+      }
+  --> passa para o estado a const criada e postriormente para URI
+      setUserPhoto(photoSelected.assets[0].uri);
+
+  --> definir tamanho maximo da imagem
+    --> utilizar a lib expo-file-system para obter informação do tamanho da imagem
+      --> npx expo install expo-file-system
+      --> import * as FileSystem from 'expo-file-system';
+      --> cria uma const para receber os dados
+          const photoInfo = await FileSystem.getInfoAsync(photoSelected.assets[0].uri);
+      --> faz a verificação
+           if(photoInfo.exists && (photoInfo.size  / 1024 / 1024 ) > 5){
+              return Alert.alert('Essa imagem é muito grande. Escolha uma de até 5MB.'); 
+          }
+
+##################################
+
+
+#### React Hook from
+--> npm install react-hook-form
+--> import { useForm, Controller } from "react-hook-form"
+
+ const { control } = useForm(); 
+
+          <Controller   
+            control={control}                              
+            name="name"    
+            render={({ field: { onChange, value } }) => ( 
+              <Input 
+                placeholder="Nome"
+                onChangeText={onChange}
+                value={value}
+              />
+            )}
+          />
+
+//o controler pertence ao control é ele quem controla 
+//o name é o nome do input tem que ser unico
+//o render é qual input quer renderizar
+//pegar os dados do input --> onChangeText
+
+--> Obtendo valores do formulário
+
+type FormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirm: string;
+}
+
+const { control, handleSubmit } = useForm<FormDataProps>();
+
+function handleSignUp({ name, email, password, password_confirm }: FormDataProps) {
+  console.log({ name, email, password, password_confirm })
+}
+
+onPress={handleSubmit(handleSignUp)}
+
+//o handleSubmit envia para função em parenteses os dados do input
+
+--> Valores Iniciais no Formulário
+
+const { control, handleSubmit } = useForm<FormDataProps>({
+  defaultValues:{
+    name: "Alexandre"
+  }
+});
+
+--> validar os inputs dentro do Controller
+
+           
+// o required faz o controle se é obrigatorio, se for ele Não executa o handleSubmit. Para pegar a msg de erro usa o formState
+// o pattern possui value com um Regex de validação e uma msg
+
+usando
+const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>();
+
+        <Controller 
+            control={control}
+            name="name"
+            rules={{
+              required: 'Informe o nome.'
+            }}
+            render={({ field: { onChange, value } }) => (
+              <Input 
+                placeholder="Nome"
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.name?.message}
+              />
+            )}
+          />
+
+
+no componente Input fica assim:
+
+type Props = IInputProps & {
+  errorMessage?: string | null;
+}
+
+export function Input({ errorMessage = null, isInvalid, ...rest }: Props) {
+  const invalid = !!errorMessage || isInvalid;
+  return (
+    <FormControl isInvalid={invalid} mb={4}> {/* coloca ele para dizer se é valido ou não */}
+      <NativeBaseInput 
+        bg="gray.700"
+        h={14}
+        px={4}
+        borderWidth={0}
+        fontSize="md"
+        color="white"
+        fontFamily="body"
+        placeholderTextColor="gray.300"
+        _focus={{
+          bgColor: 'gray.700',
+          borderWidth: 1,
+          borderColor: 'green.500'
+        }}
+        {...rest}
+      />
+
+      <FormControl.ErrorMessage>
+        {errorMessage}
+      </FormControl.ErrorMessage>
+    </FormControl>
+  );
+}
+
+##################################
+
+#### Validação com o Schema Validations yup
+Schema é um modelo, de como o formulario tem que ser
+https://www.react-hook-form.com/get-started#SchemaValidation
+
+npm install @hookform/resolvers yup
+npm i yup@latest
+
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
+const signUpSchema = yup.object({
+  name: yup.string().required('Informe o nome'),
+  email: yup.string().required('Informe o e-mail').email('E-mail inválido')
+});
+
+const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
+    resolver: yupResolver(signUpSchema),
+  });
+
+##################################
+
+#### Axios
+é um cliente http, faz as requisições e obtém as respostas do back
+npm i axios
+
+--> cria a pasta server e define a baseURL no arquivo api
+
+##################################
+
+#### AsyncStorage 
+armazena os dados do Usuario logado e se deslogou tbm 
+npx expo install @react-native-async-storage/async-storage
+pasta storage
+
+##################################
+
+#### Autenticação JWT
+o fluxo de autenticação do usuário:
+  --> Usuario solicita a autenticação, com email e senha para o back
+  --> o back retorna o os dados (nome, imagem ...) e o token de autenticação
+  --> a partir do momento que ele tem o token, todos requisições serão por elas
+O que é JWT:
+  JSON Web Token, é um meio de autenticação para a troca de informações
+para persisti os dados do token:
+  storageAuthTokenSave.ts
+
+##################################
+
+#### Refresh Token
+buscar por um token atualizado de forma automática
+
+##################################
