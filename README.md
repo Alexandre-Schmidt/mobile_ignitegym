@@ -23,7 +23,7 @@ Além disso, toda ela funciona com o uso do Async Storage, ou seja, se você fec
 <br>
 
 <p align="center">
-  <img alt="Ignite Teams" src="src/assets/Capa.png" width="100%">
+  <img alt="Ignite Teams" src="Capa.png" width="100%">
 </p>
 
 ## 🚀 Tecnologias
